@@ -34,7 +34,6 @@ model = Sequential()
 model.add(Dense(8, input_dim=2*num_q, activation='relu'))
 model.add(Dense(8, activation='relu'))
 model.add(Dense(num_q, activation='linear'))
-model.compile(loss='mse', optimizer=adam(lr=0.01))
 # model = load_model('temp_diff.h5')
 a = model.get_weights()
 
@@ -71,7 +70,8 @@ for j in range(num_episodes):
     y_data = []
     action_data = []
     lost_count_ls = []
-    print "Episode number :", j
+    model.compile(loss='mse', optimizer=adam(lr=max(0.0001, 0.01*(1. - (j+1.)/num_episodes))))
+    print("Episode number :", j)
     for i in range(time_steps):
         action = choose_action_train(state, num_q, model, epsilon)
         action_data.append(action)
@@ -102,6 +102,6 @@ for j in range(num_episodes):
     model.fit(np.array(x_data), np.array(y_data), batch_size = 32, epochs = 1, verbose = 2)
     # model.train_on_batch(np.array(x_data), np.array(y_data))
     ratio[j] = total_lost/total_arr
-    print total_lost, total_arr
-    print "ratio: ", ratio[j]
+    print(total_lost, total_arr)
+    print("ratio: ", ratio[j])
 print("--- %s seconds ---", (time.time() - start_time))
